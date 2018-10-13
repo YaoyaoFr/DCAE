@@ -68,6 +68,17 @@ def prepare_folds(data_hdf5: h5py.Group, arguments: dict, folds_hdf5: h5py.Group
                     fold.pop('train')
                 fold['train'] = ids_encode.tolist()
 
+                # Train data
+                data = load_fold(subjs=data_hdf5[dataset + '/subjects'],
+                                 fold=fold,
+                                 experiment=exp,
+                                 )
+
+                for flag in ['data', 'label']:
+                    tvt_flag = 'train {:s}'.format(flag)
+                    create_dataset_hdf5(group=fold,
+                                        name=tvt_flag,
+                                        data=data[tvt_flag])
                 continue
 
             else:
@@ -82,6 +93,17 @@ def prepare_folds(data_hdf5: h5py.Group, arguments: dict, folds_hdf5: h5py.Group
                             fold.pop(flag)
                         fold[flag] = ids_encode[index].tolist()
 
+                    data = load_fold(subjs=data_hdf5[dataset + '/subjects'],
+                                     experiment=exp,
+                                     fold=fold)
+
+                    for tvt in ['train', 'valid', 'test']:
+                        for flag in ['data', 'label']:
+                            tvt_flag = '{:s} {:s}'.format(tvt, flag)
+                            create_dataset_hdf5(group=fold,
+                                                name=tvt_flag,
+                                                dtype=float,
+                                                data=data[tvt_flag])
                 continue
 
 
